@@ -17,6 +17,7 @@ public class SocketClient
 	
 	private final long uid;
 	private final Socket socket;
+	private final String remoteAddress;
 	private long lastNetworkActivity;
 	private boolean inputRead;
 	private boolean outputWrite;
@@ -26,6 +27,7 @@ public class SocketClient
 	{
 		this.uid = uid;
 		this.socket = socket;
+		this.remoteAddress = socket.getRemoteSocketAddress().toString();
 		this.lastNetworkActivity = System.currentTimeMillis();
 	}
 	
@@ -59,6 +61,16 @@ public class SocketClient
 	public long getUID()
 	{
 		return uid;
+	}
+	
+	public String getRemoteAddress()
+	{
+		return remoteAddress;
+	}
+	
+	public long getLastNetworkActivity()
+	{
+		return lastNetworkActivity;
 	}
 	
 	public boolean isInputRead()
@@ -104,10 +116,5 @@ public class SocketClient
 	public LinkedList<Byte> getOutputBuffer()
 	{
 		return outputBuffer;
-	}
-	
-	public long getLastNetworkActivity()
-	{
-		return lastNetworkActivity;
 	}
 }
