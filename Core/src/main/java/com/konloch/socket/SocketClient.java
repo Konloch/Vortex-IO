@@ -1,6 +1,7 @@
 package com.konloch.socket;
 
 import java.io.ByteArrayOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.LinkedList;
 
@@ -27,8 +28,9 @@ public class SocketClient
 	{
 		this.uid = uid;
 		this.socket = socket;
-		this.remoteAddress = socket.getRemoteSocketAddress().toString();
 		this.lastNetworkActivity = System.currentTimeMillis();
+		InetSocketAddress address = ((InetSocketAddress) socket.getRemoteSocketAddress());
+		this.remoteAddress = (address == null ? null : (address.getAddress()).toString().replace("/",""));
 	}
 	
 	/**
