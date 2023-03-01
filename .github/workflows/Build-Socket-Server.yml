@@ -19,7 +19,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK ${{ matrix.java }}
-      working-directory: ./Core
       uses: actions/setup-java@v3
       with:
         java-version: ${{ matrix.java }}
