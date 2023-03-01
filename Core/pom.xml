@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.konloch</groupId>
-	<artifactId>SocketServer</artifactId>
+	<artifactId>Socket Server</artifactId>
 	<version>0.7.0</version>
 
 	<name>Socket Server</name>
