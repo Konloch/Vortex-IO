@@ -6,7 +6,7 @@ Add it as a maven dependency or just [download the latest release](https://githu
 ```xml
 <dependency>
   <groupId>com.konloch</groupId>
-  <artifactId>Socket Server</artifactId>
+  <artifactId>Socket-Server</artifactId>
   <version>0.7.0</version>
 </dependency>
 ```
