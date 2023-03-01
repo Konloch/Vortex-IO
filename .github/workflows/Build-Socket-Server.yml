@@ -19,19 +19,21 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK ${{ matrix.java }}
+      working-directory: ./Core
       uses: actions/setup-java@v3
       with:
         java-version: ${{ matrix.java }}
         distribution: 'temurin'
         cache: maven
-    - name: CD
-      run: cd Core
     - name: Build with Maven
+      working-directory: ./Core
       run: mvn -B package --file pom.xml
     - name: Extract Maven project version
+      working-directory: ./Core
       run: echo "lib_version=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_ENV
       id: project
     - name: 'Upload Artifact'
+      working-directory: ./Core
       uses: actions/upload-artifact@v3
       if: ${{ matrix.java == '8' }}
       with:
