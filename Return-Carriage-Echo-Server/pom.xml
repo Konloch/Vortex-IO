@@ -48,9 +48,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.konloch</groupId>
-			<artifactId>SocketServer</artifactId>
-			<version>0.7.0</version>
-			<scope>compile</scope>
+			<artifactId>Socket-Server</artifactId>
+			<version>0.7.1</version>
 		</dependency>
 	</dependencies>
 
