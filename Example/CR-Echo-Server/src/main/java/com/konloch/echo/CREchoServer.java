@@ -9,17 +9,17 @@ import java.util.HashMap;
 /**
  * An echo server implementation that contains a 1024 character buffer.
  *
- * It will echo-back the contents of the buffer if it has reached 1024 characters, or encountered a return carriage.
+ * It will echo-back the contents of the buffer if it has reached 1024 characters, or encountered a carriage return.
  *
  * @author Konloch
  * @since 2/28/2023
  */
-public class ReturnCarriageEchoServer
+public class CREchoServer
 {
 	private final SocketServer server;
 	private final HashMap<Long, ConnectedClientData> connected = new HashMap<>();
 	
-	public ReturnCarriageEchoServer(int port, int threadPool) throws IOException
+	public CREchoServer(int port, int threadPool) throws IOException
 	{
 		server = new SocketServer(port, threadPool,
 		
@@ -66,7 +66,7 @@ public class ReturnCarriageEchoServer
 						e.printStackTrace();
 					}
 					
-					//read the bytes and look for any return carriage
+					//read the bytes and look for any carriage return
 					boolean writeBack = data.buffer.size() >= 1024;
 					for(byte b : bytes)
 					{
@@ -112,10 +112,10 @@ public class ReturnCarriageEchoServer
 	{
 		try
 		{
-			ReturnCarriageEchoServer echoServer = new ReturnCarriageEchoServer(7, 1);
+			CREchoServer echoServer = new CREchoServer(7, 1);
 			echoServer.start();
 			
-			System.out.println("Return Carriage Echo Server running on port " + echoServer.server.getPort());
+			System.out.println("Carriage Return Echo Server running on port " + echoServer.server.getPort());
 		}
 		catch (IOException e)
 		{

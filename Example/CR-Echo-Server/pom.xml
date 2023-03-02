@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.konloch</groupId>
-	<artifactId>ReturnCarriageEchoServer</artifactId>
+	<artifactId>CR-Echo-Server</artifactId>
 	<version>1.0.0</version>
 
-	<name>Return Carriage Echo Server</name>
-	<description>Return Carriage Echo Server is an easy-to-use zero dependency low-level non-blocking echo server for Java.</description>
-	<url>https://konloch.com/Return-Carriage-Echo-Server/</url>
+	<name>CR Echo Server</name>
+	<description>CR Echo Server is an easy-to-use zero dependency low-level non-blocking echo server for Java.</description>
+	<url>https://konloch.com/CR-Echo-Server/</url>
 	<inceptionYear>2023</inceptionYear>
 
 	<licenses>
@@ -35,7 +35,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/Konloch/Socket-Server.git</connection>
 		<developerConnection>scm:git:ssh://github.com:Konloch/Socket-Server.git</developerConnection>
-		<url>http://github.com/Konloch/Socket-Server/tree/master/Return-Carriage-Echo-Server</url>
+		<url>http://github.com/Konloch/Socket-Server/tree/master/Example/CR-Echo-Server</url>
 	</scm>
 
 	<properties>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>com.konloch</groupId>
 			<artifactId>Socket-Server</artifactId>
-			<version>0.8.1</version>
+			<version>0.9.1</version>
 		</dependency>
 	</dependencies>
 
@@ -112,7 +112,7 @@
 				<configuration>
 					<transformers>
 						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>com.konloch.echo.ReturnCarriageEchoServer</mainClass>
+							<mainClass>com.konloch.echo.CREchoServer</mainClass>
 							<manifestEntries>
 								<Implementation-Version>${project.version}</Implementation-Version>
 								<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
