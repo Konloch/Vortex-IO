@@ -14,3 +14,9 @@ You can run the Java Jar file directly, or you can use it as a library
 ReturnCarriageEchoServer server = new ReturnCarriageEchoServer(7, 1);
 server.start();
 ```
+
+### How To Connect
+Using `telnet` you can easily test the server.
+```
+telnet localhost 7
+```
