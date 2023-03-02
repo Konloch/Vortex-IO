@@ -1,5 +1,6 @@
 package com.konloch.socket;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ class SocketServerIOHandler implements Runnable
 	@Override
 	public void run()
 	{
+		ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
 		while (socketServer.isRunning())
 		{
 			try
@@ -77,10 +79,8 @@ class SocketServerIOHandler implements Runnable
 							continue;
 						}
 						
-						//process reading
-						if (client.isInputRead() && client.getSocket().isOpen())
+						//process reading (always in the reading state unless disconnected)
 						{
-							ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
 							client.getSocket().read(buffer);
 							
 							if (buffer.position() > 0)
@@ -94,38 +94,62 @@ class SocketServerIOHandler implements Runnable
 							buffer.clear();
 						}
 						
-						//processing writing
+						//processing writing (only write when asked to)
 						if (client.isOutputWrite())
 						{
-							ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
-							boolean bufferHasData = false;
-							
-							if (!client.getOutputBuffer().isEmpty())
+							boolean fromCache = client.getOutputBufferCache() != null;
+							if (client.getOutputBuffer().size() > 0 || fromCache)
 							{
-								for (int i = 0; i < socketServer.getIOAmount(); i++)
-								{
-									if(!bufferHasData)
-										bufferHasData = true;
-									
-									buffer.put(client.getOutputBuffer().pop());
-									
-									if (client.getOutputBuffer().isEmpty())
-										break;
-								}
+								int offset = client.getOutputBufferProgress();
 								
+								int readMax = socketServer.getIOAmount();
+								
+								if(!fromCache)
+									client.setOutputBufferCache(client.getOutputBuffer().toByteArray());
+								
+								//dump the buffer
+								byte[] bufferDump = client.getOutputBufferCache();
+								
+								if(offset+readMax > bufferDump.length)
+									readMax = bufferDump.length - offset;
+								
+								//clear the buffer
+								if(client.outputBufferProgress(readMax) >= bufferDump.length)
+									client.resetOutputBuffer();
+								
+								//write what we can to the socket
+								buffer.put(bufferDump, offset, readMax);
+								
+								//flip the stored data
 								buffer.flip();
-							}
-							
-							if(bufferHasData)
-							{
+								
+								//reset the network activity
 								client.resetLastNetworkActivity();
+								
+								//sent the buffer
 								client.getSocket().write(buffer);
+								
+								//clear the buffer
 								buffer.clear();
 							}
 							else
 							{
 								client.setOutputWrite(false);
 							}
+						}
+					}
+					catch (IOException e)
+					{
+						//ignore IO exceptions as they get thrown often
+						//e.printStackTrace();
+						
+						try
+						{
+							client.getSocket().close();
+						}
+						catch (Exception ex)
+						{
+							e.printStackTrace();
 						}
 					}
 					catch (Exception e)

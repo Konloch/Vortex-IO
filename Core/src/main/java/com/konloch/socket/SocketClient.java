@@ -3,7 +3,6 @@ package com.konloch.socket;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.LinkedList;
 
 /**
  * @author Konloch
@@ -12,17 +11,16 @@ import java.util.LinkedList;
 public class SocketClient
 {
 	private final ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
-	
-	//TODO this should be swapped to a ByteArrayOutputStream, however it needs to be able to shrink, so maybe a new type is needed
-	private final LinkedList<Byte> outputBuffer = new LinkedList<>();
-	
+	private final ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
 	private final long uid;
 	private final SocketChannel socket;
 	private final String remoteAddress;
 	private long lastNetworkActivity;
-	private boolean inputRead;
+	private boolean inputRead = true;
 	private boolean outputWrite;
 	private int state;
+	private int outputBufferProgress;
+	private byte[] outputBufferCache;
 	
 	/**
 	 * Construct a new socket client
@@ -32,19 +30,7 @@ public class SocketClient
 		this.uid = uid;
 		this.socket = socket;
 		this.lastNetworkActivity = System.currentTimeMillis();
-		
-		String remoteAddressTMP;
-		try
-		{
-			remoteAddressTMP = socket.getRemoteAddress().toString();
-		}
-		catch (IOException e)
-		{
-			remoteAddressTMP = null;
-			e.printStackTrace();
-		}
-		
-		this.remoteAddress = remoteAddressTMP;
+		this.remoteAddress = socket.socket().getInetAddress().toString().replace("/","");
 	}
 	
 	/**
@@ -54,11 +40,48 @@ public class SocketClient
 	 */
 	public void write(byte[] bytes)
 	{
-		//write in reverse order
-		for(int i = bytes.length-1; i >= 0; i--)
-			getOutputBuffer().push(bytes[i]);
+		try
+		{
+			getOutputBuffer().write(bytes);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		
 		setOutputWrite(true);
+	}
+	
+	/**
+	 * Returns the output buffer write progress
+	 *
+	 * @return the output buffer write progress
+	 */
+	public int getOutputBufferProgress()
+	{
+		return outputBufferProgress;
+	}
+	
+	/**
+	 * Adds to the output buffer progress and then returns the current value
+	 *
+	 * @param add the amount of progress to increase by
+	 * @return the output buffer write progress
+	 */
+	public int outputBufferProgress(int add)
+	{
+		outputBufferProgress += add;
+		return outputBufferProgress;
+	}
+	
+	/**
+	 * Resets the output buffer state
+	 */
+	public void resetOutputBuffer()
+	{
+		outputBufferCache = null;
+		outputBufferProgress = 0;
+		getOutputBuffer().reset();
 	}
 	
 	/**
@@ -169,11 +192,31 @@ public class SocketClient
 	/**
 	 * Returns the output buffer
 	 *
-	 * @return the byte LinkedList representing the output buffer
+	 * @return the ByteArrayOutputStream representing the output buffer
 	 */
-	public LinkedList<Byte> getOutputBuffer()
+	public ByteArrayOutputStream getOutputBuffer()
 	{
 		return outputBuffer;
+	}
+	
+	/**
+	 * Return the output buffer cache
+	 * @return the byte array representing the output buffer cache
+	 */
+	public byte[] getOutputBufferCache()
+	{
+		return outputBufferCache;
+	}
+	
+	/**
+	 * Set the output buffer cache
+	 *
+	 * @param outputBufferCache any byte array as the buffer cache
+	 */
+	public void setOutputBufferCache(byte[] outputBufferCache)
+	{
+		this.outputBufferCache = outputBufferCache;
+		setOutputWrite(true);
 	}
 	
 	/**

@@ -23,7 +23,7 @@ public class SocketServer extends Thread
 	private SocketClientRunnable onDisconnect;
 	private int threadPoolCounter;
 	private boolean running;
-	private int ioAmount = 256;
+	private int ioAmount = 1024;
 	private int timeout = 30_000;
 	private long uidCounter;
 	
