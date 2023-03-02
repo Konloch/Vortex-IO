@@ -1,6 +1,7 @@
 package com.konloch.socket;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,71 +74,48 @@ class SocketServerIO implements Runnable
 						}
 						
 						//process reading
-						if (client.isInputRead())
+						if (client.isInputRead() && client.getSocket().isOpen())
 						{
-							InputStream stream = client.getSocket().getInputStream();
+							ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
+							client.getSocket().read(buffer);
 							
-							if (stream.available() > 0)
-							{
-								for (int i = 0; i < socketServer.getIOAmount(); i++)
-								{
-									int read = stream.read();
-									
-									if (read > 0)
-									{
-										client.getInputBuffer().write(read);
-										client.resetLastNetworkActivity();
-									}
-									else
-									{
-										client.setInputRead(false);
-										break;
-									}
-									
-									if (stream.available() <= 0)
-										break;
-								}
-							}
+							if (buffer.position() > 0)
+								client.getInputBuffer().write(buffer.array(), 0, buffer.position());
 							else
 								client.setInputRead(false);
+							
+							buffer.clear();
 						}
 						
 						//processing writing
 						if (client.isOutputWrite())
 						{
+							ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
+							boolean bufferHasData = false;
+							
 							if (!client.getOutputBuffer().isEmpty())
 							{
 								for (int i = 0; i < socketServer.getIOAmount(); i++)
 								{
-									byte b = client.getOutputBuffer().pop();
+									if(!bufferHasData)
+										bufferHasData = true;
 									
-									try
-									{
-										client.getSocket().getOutputStream().write(b);
-										client.resetLastNetworkActivity();
-									}
-									catch (Exception e)
-									{
-										e.printStackTrace();
-										client.setOutputWrite(false);
-										break;
-									}
+									buffer.put(client.getOutputBuffer().pop());
 									
 									if (client.getOutputBuffer().isEmpty())
 										break;
 								}
+								
+								buffer.flip();
+							}
+							
+							if(bufferHasData)
+							{
+								client.getSocket().write(buffer);
+								buffer.clear();
 							}
 							else
 							{
-								try
-								{
-									client.getSocket().getOutputStream().flush();
-								}
-								catch (Exception e)
-								{
-									e.printStackTrace();
-								}
-								
 								client.setOutputWrite(false);
 							}
 						}

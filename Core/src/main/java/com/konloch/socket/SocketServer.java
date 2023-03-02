@@ -4,8 +4,9 @@ import com.konloch.socket.interfaces.SocketClientIsAllowed;
 import com.konloch.socket.interfaces.SocketClientRunnable;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.Set;
 
 /**
@@ -15,14 +16,14 @@ import java.util.Set;
 public class SocketServer extends Thread
 {
 	private final int port;
-	private final ServerSocket server;
+	private final ServerSocketChannel server;
 	private final SocketServerIO[] threadPool;
 	private SocketClientIsAllowed canConnect;
 	private SocketClientRunnable onProcess;
 	private SocketClientRunnable onDisconnect;
 	private int threadPoolCounter;
 	private boolean running;
-	private int ioAmount = 1024;
+	private int ioAmount = 256;
 	private int timeout = 30_000;
 	private long uidCounter;
 	
@@ -35,11 +36,15 @@ public class SocketServer extends Thread
 	                    SocketClientRunnable onProcess, SocketClientRunnable onDisconnect) throws IOException
 	{
 		this.port = port;
-		this.server = new ServerSocket(port);
+		this.server = ServerSocketChannel.open();
 		this.threadPool = new SocketServerIO[threadPool];
 		this.canConnect = canConnect;
 		this.onProcess = onProcess;
 		this.onDisconnect = onDisconnect;
+		
+		//bind and configure non-blocking
+		server.bind(new InetSocketAddress("localhost", port));
+		server.configureBlocking(false);
 	}
 	
 	/**
@@ -63,8 +68,15 @@ public class SocketServer extends Thread
 		{
 			try
 			{
+				SocketChannel channel = server.accept();
+				if(channel == null)
+					continue;
+				
+				//enable nio
+				channel.configureBlocking(false);
+				
 				//build the socket client instance
-				SocketClient client = new SocketClient(uidCounter++, server.accept());
+				SocketClient client = new SocketClient(uidCounter++, channel);
 				
 				//verify the socket client is allowed in
 				if(canConnect == null || canConnect.allowed(client))
@@ -145,16 +157,6 @@ public class SocketServer extends Thread
 	public SocketServer setTimeout(int timeout)
 	{
 		this.timeout = timeout;
-		
-		try
-		{
-			server.setSoTimeout(timeout);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		
 		return this;
 	}
 	

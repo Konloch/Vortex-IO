@@ -1,8 +1,10 @@
 package com.konloch.socket;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 
 /**
@@ -17,20 +19,31 @@ public class SocketClient
 	private final LinkedList<Byte> outputBuffer = new LinkedList<>();
 	
 	private final long uid;
-	private final Socket socket;
+	private final SocketChannel socket;
 	private final String remoteAddress;
 	private long lastNetworkActivity;
 	private boolean inputRead;
 	private boolean outputWrite;
 	private int state;
 	
-	public SocketClient(long uid, Socket socket)
+	public SocketClient(long uid, SocketChannel socket)
 	{
 		this.uid = uid;
 		this.socket = socket;
 		this.lastNetworkActivity = System.currentTimeMillis();
-		InetSocketAddress address = ((InetSocketAddress) socket.getRemoteSocketAddress());
-		this.remoteAddress = (address == null ? null : (address.getAddress()).toString().replace("/",""));
+		
+		String remoteAddressTMP;
+		try
+		{
+			remoteAddressTMP = socket.getRemoteAddress().toString();
+		}
+		catch (IOException e)
+		{
+			remoteAddressTMP = null;
+			e.printStackTrace();
+		}
+		
+		this.remoteAddress = remoteAddressTMP;
 	}
 	
 	/**
@@ -105,11 +118,6 @@ public class SocketClient
 		this.state = state;
 	}
 	
-	public Socket getSocket()
-	{
-		return socket;
-	}
-	
 	public ByteArrayOutputStream getInputBuffer()
 	{
 		return inputBuffer;
@@ -118,5 +126,10 @@ public class SocketClient
 	public LinkedList<Byte> getOutputBuffer()
 	{
 		return outputBuffer;
+	}
+	
+	public SocketChannel getSocket()
+	{
+		return socket;
 	}
 }
