@@ -21,7 +21,7 @@ Add it as a maven dependency or just [download the latest release](https://githu
 * [Download Releases](https://github.com/Konloch/Socket-Server/releases)
 
 ## How To Use
-You can view an [HTTPServer implementation here](https://github.com/Konloch/TinyHTTPServer), or an [Echo Server implementation here](https://github.com/Konloch/Socket-Server/tree/main/Return-Carriage-Echo-Server).
+You can view an [HTTPServer implementation here](https://github.com/Konloch/TinyHTTPServer), or an [Echo Server implementation here](https://github.com/Konloch/Socket-Server/tree/main/Example/Return-Carriage-Echo-Server).
 
 ### RFC-862 compliant echo server
 ```java
