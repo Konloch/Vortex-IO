@@ -11,7 +11,7 @@ Add it as a maven dependency or just [download the latest release](https://githu
 <dependency>
   <groupId>com.konloch</groupId>
   <artifactId>Socket-Server</artifactId>
-  <version>0.7.1</version>
+  <version>0.8.0</version>
 </dependency>
 ```
 
