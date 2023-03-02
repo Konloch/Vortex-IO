@@ -1,6 +1,5 @@
 package com.konloch.socket;
 
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
@@ -10,12 +9,17 @@ import java.util.Set;
  * @author Konloch
  * @since 3/1/2023
  */
-class SocketServerIO implements Runnable
+class SocketServerIOHandler implements Runnable
 {
 	private final SocketServer socketServer;
 	private final Set<SocketClient> clients = new HashSet<>();
 	
-	public SocketServerIO(SocketServer socketServer)
+	/**
+	 * Construct a new SocketServerIO
+	 *
+	 * @param socketServer the SocketServer this IO Handler is bound to
+	 */
+	public SocketServerIOHandler(SocketServer socketServer)
 	{
 		this.socketServer = socketServer;
 	}
@@ -127,7 +131,7 @@ class SocketServerIO implements Runnable
 					
 					try
 					{
-						socketServer.getOnProcess().run(client);
+						socketServer.getRequestHandler().run(client);
 					}
 					catch (Exception e)
 					{
@@ -146,6 +150,11 @@ class SocketServerIO implements Runnable
 		}
 	}
 	
+	/**
+	 * Return the Socket Client Set containing the connected clients
+	 *
+	 * @return the Socket Client set containing the connected clients
+	 */
 	public Set<SocketClient> getClients()
 	{
 		return clients;

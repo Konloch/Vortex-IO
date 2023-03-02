@@ -17,9 +17,9 @@ public class SocketServer extends Thread
 {
 	private final int port;
 	private final ServerSocketChannel server;
-	private final SocketServerIO[] threadPool;
-	private SocketClientIsAllowed canConnect;
-	private SocketClientRunnable onProcess;
+	private final SocketServerIOHandler[] threadPool;
+	private SocketClientIsAllowed networkConnectionFilter;
+	private SocketClientRunnable requestHandler;
 	private SocketClientRunnable onDisconnect;
 	private int threadPoolCounter;
 	private boolean running;
@@ -27,19 +27,36 @@ public class SocketServer extends Thread
 	private int timeout = 30_000;
 	private long uidCounter;
 	
-	public SocketServer(int port, SocketClientRunnable onProcess) throws IOException
+	/**
+	 * Construct a new Socket Server
+	 *
+	 * @param port any port between 0-65,535
+	 * @param requestHandler the request handler
+	 * @throws IOException thrown if any IO issues are encountered.
+	 */
+	public SocketServer(int port, SocketClientRunnable requestHandler) throws IOException
 	{
-		this(port, 1, null, onProcess, null);
+		this(port, 1, null, requestHandler, null);
 	}
 	
-	public SocketServer(int port, int threadPool, SocketClientIsAllowed canConnect,
-	                    SocketClientRunnable onProcess, SocketClientRunnable onDisconnect) throws IOException
+	/**
+	 * Construct a new Socket Server
+	 *
+	 * @param port any port between 0-65,535
+	 * @param threadPool the amount of threads that will be started
+	 * @param networkConnectionFilter the pre-requst filter
+	 * @param requestHandler the request handler
+	 * @param onDisconnect called any time the client disconnects
+	 * @throws IOException thrown if any IO issues are encountered.
+	 */
+	public SocketServer(int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
+	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect) throws IOException
 	{
 		this.port = port;
 		this.server = ServerSocketChannel.open();
-		this.threadPool = new SocketServerIO[threadPool];
-		this.canConnect = canConnect;
-		this.onProcess = onProcess;
+		this.threadPool = new SocketServerIOHandler[threadPool];
+		this.networkConnectionFilter = networkConnectionFilter;
+		this.requestHandler = requestHandler;
 		this.onDisconnect = onDisconnect;
 		
 		//bind and configure non-blocking
@@ -60,7 +77,7 @@ public class SocketServer extends Thread
 		
 		for(int i = 0; i < threadPool.length; i++)
 		{
-			SocketServerIO socketIO = new SocketServerIO(this);
+			SocketServerIOHandler socketIO = new SocketServerIOHandler(this);
 			new Thread(threadPool[i] = socketIO).start();
 		}
 		
@@ -79,7 +96,7 @@ public class SocketServer extends Thread
 				SocketClient client = new SocketClient(uidCounter++, channel);
 				
 				//verify the socket client is allowed in
-				if(canConnect == null || canConnect.allowed(client))
+				if(networkConnectionFilter == null || networkConnectionFilter.allowed(client))
 				{
 					//TODO thread pool should be assigned to the thread pool with the lowest amount of clients
 					threadPool[threadPoolCounter++].getClients().add(client);
@@ -95,86 +112,164 @@ public class SocketServer extends Thread
 		}
 	}
 	
+	/**
+	 * Returns the port the socket server is bound to
+	 *
+	 * @return the port the socket server is bound to
+	 */
 	public int getPort()
 	{
 		return port;
 	}
 	
+	/**
+	 * Returns true if the socket server is still running
+	 *
+	 * @return true if the socket server is still running
+	 */
 	public boolean isRunning()
 	{
 		return running;
 	}
 	
+	/**
+	 * Stops the socket server
+	 *
+	 * @return this instance for method chaining
+	 */
 	public SocketServer stopSocketServer()
 	{
 		running = false;
 		return this;
 	}
 	
+	/**
+	 * Returns true if the socket server has been stopped
+	 *
+	 * @return true if the socket server has been stopped
+	 */
 	public boolean hasStopped()
 	{
 		return !running;
 	}
 	
-	public SocketClientRunnable getOnProcess()
+	/**
+	 * Returns the request handler
+	 *
+	 * @return the request handler
+	 */
+	public SocketClientRunnable getRequestHandler()
 	{
-		return onProcess;
+		return requestHandler;
 	}
 	
-	public SocketServer setOnProcess(SocketClientRunnable onProcess)
+	/**
+	 * Set the request handler
+	 *
+	 * @param requestHandler any request handler
+	 * @return this instance for method chaining
+	 */
+	public SocketServer setRequestHandler(SocketClientRunnable requestHandler)
 	{
-		this.onProcess = onProcess;
+		this.requestHandler = requestHandler;
 		return this;
 	}
 	
+	/**
+	 * Returns the onDisconnect handler
+	 *
+	 * @return the onDisconnect handler
+	 */
 	public SocketClientRunnable getOnDisconnect()
 	{
 		return onDisconnect;
 	}
 	
+	/**
+	 * Set the onDisconnect handler
+	 *
+	 * @param onDisconnect any onDisconnet handler
+	 * @return this instance for method chaining
+	 */
 	public SocketServer setOnDisconnect(SocketClientRunnable onDisconnect)
 	{
 		this.onDisconnect = onDisconnect;
 		return this;
 	}
 	
-	public SocketClientIsAllowed getCanConnect()
+	/**
+	 * Returns the network connection filter
+	 *
+	 * @return the network connection filder
+	 */
+	public SocketClientIsAllowed getNetworkConnectionFilter()
 	{
-		return canConnect;
+		return networkConnectionFilter;
 	}
 	
-	public SocketServer setCanConnect(SocketClientIsAllowed canConnect)
+	/**
+	 * Sets the network connection filter
+	 * @param networkConnectionFilter any network connection filter
+	 * @return this instance for method chaining
+	 */
+	public SocketServer setNetworkConnectionFilter(SocketClientIsAllowed networkConnectionFilter)
 	{
-		this.canConnect = canConnect;
+		this.networkConnectionFilter = networkConnectionFilter;
 		return this;
 	}
 	
+	/**
+	 * Returns the Socket Client set for the supplied thread pool index
+	 * @param index any integer to represent the thread pool index
+	 * @return the Socket Client Set for the supplied thread pool index
+	 */
 	public Set<SocketClient> getClients(int index)
 	{
 		return threadPool[index].getClients();
 	}
 	
+	/**
+	 * Returns the timeout value in milliseconds for network inactivity
+	 * @return the timeout value in milliseconds for network inactivity
+	 */
+	public int getTimeout()
+	{
+		return timeout;
+	}
+	
+	/**
+	 * Set the timeout value for network activity
+	 *
+	 * @param timeout any integer representing the milliseconds for timeout from network activity
+	 * @return this instance for method chaining
+	 */
 	public SocketServer setTimeout(int timeout)
 	{
 		this.timeout = timeout;
 		return this;
 	}
 	
-	public int getTimeout()
+	/**
+	 * Return the default size of the byte buffers
+	 *
+	 * @return default size of the byte buffers
+	 */
+	public int getIOAmount()
 	{
-		return timeout;
+		return ioAmount;
 	}
 	
+	/**
+	 * Set the default size of the byte buffers
+	 *
+	 * @param ioAmount any integer as the default size of the byte buffers
+	 * @return this instance for method chaining
+	 */
 	public SocketServer setIOAmount(int ioAmount)
 	{
 		this.ioAmount = ioAmount;
 		
 		return this;
-	}
-	
-	public int getIOAmount()
-	{
-		return ioAmount;
 	}
 	
 	/**
