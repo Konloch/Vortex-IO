@@ -15,7 +15,8 @@ public class SocketClient
 	private final long uid;
 	private final SocketChannel socket;
 	private final String remoteAddress;
-	private long lastNetworkActivity;
+	private long lastNetworkActivityRead;
+	private long lastNetworkActivityWrite;
 	private boolean inputRead = true;
 	private boolean outputWrite;
 	private int state;
@@ -29,7 +30,7 @@ public class SocketClient
 	{
 		this.uid = uid;
 		this.socket = socket;
-		this.lastNetworkActivity = System.currentTimeMillis();
+		this.lastNetworkActivityRead = this.lastNetworkActivityWrite = System.currentTimeMillis();
 		this.remoteAddress = socket.socket().getInetAddress().toString().replace("/","");
 	}
 	
@@ -85,11 +86,19 @@ public class SocketClient
 	}
 	
 	/**
-	 * Reset the last network activity
+	 * Reset the last read network activity
 	 */
-	protected void resetLastNetworkActivity()
+	protected void resetLastNetworkActivityRead()
 	{
-		lastNetworkActivity = System.currentTimeMillis();
+		lastNetworkActivityRead = System.currentTimeMillis();
+	}
+	
+	/**
+	 * Reset the last write network activity
+	 */
+	protected void resetLastNetworkActivityWrite()
+	{
+		lastNetworkActivityWrite = System.currentTimeMillis();
 	}
 	
 	/**
@@ -112,13 +121,23 @@ public class SocketClient
 	}
 	
 	/**
-	 * Returns the last network activity for this socket
+	 * Returns the last read network activity for this socket
 	 *
-	 * @return a long representing the timestamp of the last time the socket read or wrote
+	 * @return a long representing the timestamp of the last time the socket read
 	 */
-	public long getLastNetworkActivity()
+	public long getLastNetworkActivityRead()
 	{
-		return lastNetworkActivity;
+		return lastNetworkActivityRead;
+	}
+	
+	/**
+	 * Returns the last write network activity for this socket
+	 *
+	 * @return a long representing the timestamp of the last time the socket writes
+	 */
+	public long getLastNetworkActivityWrite()
+	{
+		return lastNetworkActivityWrite;
 	}
 	
 	/**

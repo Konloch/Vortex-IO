@@ -73,26 +73,24 @@ class SocketServerIOHandler implements Runnable
 							continue;
 						
 						//timeout if there is no network activity
-						if (now - client.getLastNetworkActivity() > socketServer.getTimeout())
+						if (now - client.getLastNetworkActivityWrite() > socketServer.getTimeout())
 						{
 							client.getSocket().close();
 							continue;
 						}
 						
 						//process reading (always in the reading state unless disconnected)
+						client.getSocket().read(buffer);
+						
+						if (buffer.position() > 0)
 						{
-							client.getSocket().read(buffer);
-							
-							if (buffer.position() > 0)
-							{
-								client.resetLastNetworkActivity();
-								client.getInputBuffer().write(buffer.array(), 0, buffer.position());
-							}
-							else
-								client.setInputRead(false);
-							
-							buffer.clear();
+							client.resetLastNetworkActivityRead();
+							client.getInputBuffer().write(buffer.array(), 0, buffer.position());
 						}
+						else
+							client.setInputRead(false);
+						
+						buffer.clear();
 						
 						//processing writing (only write when asked to)
 						if (client.isOutputWrite())
@@ -124,7 +122,7 @@ class SocketServerIOHandler implements Runnable
 								buffer.flip();
 								
 								//reset the network activity
-								client.resetLastNetworkActivity();
+								client.resetLastNetworkActivityWrite();
 								
 								//sent the buffer
 								client.getSocket().write(buffer);

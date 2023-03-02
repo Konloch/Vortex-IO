@@ -104,6 +104,23 @@ public class SocketServer extends Thread
 					if (threadPoolCounter >= threadPool.length)
 						threadPoolCounter = 0;
 				}
+				else
+				{
+					try
+					{
+						client.getSocket().close();
+						client.getSocket().socket().close();
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					finally
+					{
+						if(getOnDisconnect() != null)
+							getOnDisconnect().run(client);
+					}
+				}
 			}
 			catch (IOException e)
 			{
