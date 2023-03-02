@@ -2,8 +2,8 @@
 Socket Server is a low-level non-blocking socket server API.
 
 + For the core library [click here](https://github.com/Konloch/Socket-Server/tree/main/Core).
-+ For an echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Echo-Server).
-+ For an return carriage echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Return-Carriage-Echo-Server).
++ For an echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Example/Echo-Server).
++ For an return carriage echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Example/Return-Carriage-Echo-Server).
 
 ## How To Add As Library
 Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Socket-Server/releases).
