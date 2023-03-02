@@ -1,6 +1,65 @@
 # Socket Server
-This is an experimental project.
+Socket Server is a low-level non-blocking socket server API.
 
 + For the core library [click here](https://github.com/Konloch/Socket-Server/tree/main/Core).
-+ For the echo server [click here](https://github.com/Konloch/Socket-Server/tree/main/Echo-Server).
-+ For the return carriage echo server [click here](https://github.com/Konloch/Socket-Server/tree/main/Return-Carriage-Echo-Server).
++ For an echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Echo-Server).
++ For an return carriage echo server implementation [click here](https://github.com/Konloch/Socket-Server/tree/main/Return-Carriage-Echo-Server).
+
+## How To Add As Library
+Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Socket-Server/releases).
+```xml
+<dependency>
+  <groupId>com.konloch</groupId>
+  <artifactId>Socket-Server</artifactId>
+  <version>0.7.1</version>
+</dependency>
+```
+
+## Links
+* [Website](https://konloch.com/Socket-Server/)
+* [Discord Server](https://discord.gg/aexsYpfMEf)
+* [Download Releases](https://github.com/Konloch/Socket-Server/releases)
+
+## How To Use
+You can view an [HTTPServer implementation here](https://github.com/Konloch/TinyHTTPServer), or an [Echo Server implementation here](https://github.com/Konloch/Socket-Server/tree/main/Return-Carriage-Echo-Server).
+
+### RFC-862 compliant echo server
+```java
+SocketServer server = new SocketServer(7, client -> 
+{
+    switch(client.getState())
+    {
+        //signal we want to start reading into the buffer
+        case 0:
+            //signal that we want to start reading and to fill up the buffer
+            client.setInputRead(true);
+            
+            //advance to stage 1
+            client.setState(1);
+            break;
+            
+        //wait until the stream has signalled the buffer has reached the end
+        case 1:
+            //when the buffer is full advance to stage 2
+            if(!client.isInputRead())
+                client.setState(2);
+            break;
+            
+        //announce the read
+        case 2:
+            //get the bytes written
+            byte[] bytes = client.getInputBuffer().toByteArray();
+            
+            //reset the input buffer
+            client.getInputBuffer().reset();
+        
+            //echo the bytes back
+            client.write(bytes);
+            
+            //loop back to stage 0
+            client.setState(0);
+            break;
+    }
+});
+server.start();
+```
