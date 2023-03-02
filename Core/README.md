@@ -1,5 +1,5 @@
 # Socket Server
-Socket Server is a low-level socket server API.
+Socket Server is a low-level non-blocking socket server API.
 
 ## How To Add As Library
 Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Socket-Server/releases).
