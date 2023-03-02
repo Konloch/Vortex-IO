@@ -84,7 +84,10 @@ class SocketServerIOHandler implements Runnable
 							client.getSocket().read(buffer);
 							
 							if (buffer.position() > 0)
+							{
+								client.resetLastNetworkActivity();
 								client.getInputBuffer().write(buffer.array(), 0, buffer.position());
+							}
 							else
 								client.setInputRead(false);
 							
@@ -115,6 +118,7 @@ class SocketServerIOHandler implements Runnable
 							
 							if(bufferHasData)
 							{
+								client.resetLastNetworkActivity();
 								client.getSocket().write(buffer);
 								buffer.clear();
 							}

@@ -3,7 +3,7 @@
 
 	<groupId>com.konloch</groupId>
 	<artifactId>Socket-Server</artifactId>
-	<version>0.8.0</version>
+	<version>0.8.1</version>
 
 	<name>Socket Server</name>
 	<description>Socket Server is an easy-to-use zero dependency low-level socket server for Java.</description>
