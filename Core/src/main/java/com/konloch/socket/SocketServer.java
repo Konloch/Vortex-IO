@@ -1,7 +1,7 @@
 package com.konloch.socket;
 
+import com.konloch.socket.interfaces.SocketClientIsAllowed;
 import com.konloch.socket.interfaces.SocketClientRunnable;
-import com.konloch.socket.interfaces.SocketIsAllowed;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,7 +17,7 @@ public class SocketServer extends Thread
 	private final int port;
 	private final ServerSocket server;
 	private final SocketServerIO[] threadPool;
-	private SocketIsAllowed canConnect;
+	private SocketClientIsAllowed canConnect;
 	private SocketClientRunnable onProcess;
 	private SocketClientRunnable onDisconnect;
 	private int threadPoolCounter;
@@ -31,7 +31,7 @@ public class SocketServer extends Thread
 		this(port, 1, null, onProcess, null);
 	}
 	
-	public SocketServer(int port, int threadPool, SocketIsAllowed canConnect,
+	public SocketServer(int port, int threadPool, SocketClientIsAllowed canConnect,
 	                    SocketClientRunnable onProcess, SocketClientRunnable onDisconnect) throws IOException
 	{
 		this.port = port;
@@ -63,11 +63,14 @@ public class SocketServer extends Thread
 		{
 			try
 			{
-				Socket socket = server.accept();
-				if(canConnect == null || canConnect.allowed(socket))
+				//build the socket client instance
+				SocketClient client = new SocketClient(uidCounter++, server.accept());
+				
+				//verify the socket client is allowed in
+				if(canConnect == null || canConnect.allowed(client))
 				{
 					//TODO thread pool should be assigned to the thread pool with the lowest amount of clients
-					threadPool[threadPoolCounter++].getClients().add(new SocketClient(uidCounter++, socket));
+					threadPool[threadPoolCounter++].getClients().add(client);
 					
 					if (threadPoolCounter >= threadPool.length)
 						threadPoolCounter = 0;
@@ -123,12 +126,12 @@ public class SocketServer extends Thread
 		return this;
 	}
 	
-	public SocketIsAllowed getCanConnect()
+	public SocketClientIsAllowed getCanConnect()
 	{
 		return canConnect;
 	}
 	
-	public SocketServer setCanConnect(SocketIsAllowed canConnect)
+	public SocketServer setCanConnect(SocketClientIsAllowed canConnect)
 	{
 		this.canConnect = canConnect;
 		return this;
