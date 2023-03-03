@@ -72,9 +72,10 @@ class SocketServerIOHandler implements Runnable
 						//if the client has been disconnected, do not try to process anything
 						if (!client.getSocket().isConnected())
 							continue;
-						
+
 						//timeout if there is no network activity
-						if (now - client.getLastNetworkActivityWrite() > socketServer.getTimeout())
+						if (Math.min(now - client.getLastNetworkActivityWrite(),
+								now - client.getLastNetworkActivityRead()) > socketServer.getTimeout())
 						{
 							client.getSocket().close();
 							continue;

@@ -85,12 +85,11 @@ public class SocketServer extends Thread
 		{
 			try
 			{
-				SocketChannel channel = server.accept();
-				
-				if(channel == null)
+				//accept connection is a non-blocking call.
+				//it will only allow the thread to rest if an incoming connection did not queue
+				//this keeps the socket server ready for burst connections but able to rest when there are none coming in
+				if(!acceptConnection())
 				{
-					//since server.accept is not non-blocking, you need to wait the thread either using some form of
-					//locks, synchronization, or just by Thread.sleep.
 					try
 					{
 						Thread.sleep(1);
@@ -99,41 +98,6 @@ public class SocketServer extends Thread
 					{
 						e.printStackTrace();
 					}
-					
-					continue;
-				}
-				
-				//enable nio
-				channel.configureBlocking(false);
-				
-				//build the socket client instance
-				SocketClient client = new SocketClient(uidCounter++, channel);
-				
-				//verify the socket client is allowed in
-				if(networkConnectionFilter == null || networkConnectionFilter.allowed(client))
-				{
-					//TODO thread pool should be assigned to the thread pool with the lowest amount of clients
-					threadPool[threadPoolCounter++].getClients().add(client);
-					
-					if (threadPoolCounter >= threadPool.length)
-						threadPoolCounter = 0;
-				}
-				else
-				{
-					try
-					{
-						client.getSocket().close();
-						client.getSocket().socket().close();
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-					finally
-					{
-						if(getOnDisconnect() != null)
-							getOnDisconnect().run(client);
-					}
 				}
 			}
 			catch (IOException e)
@@ -141,6 +105,55 @@ public class SocketServer extends Thread
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * Attempts to accept an incoming socket connection, if there is not one in the queue it will return false.
+	 *
+	 * @return true if a connection has been accepted
+	 * @throws IOException thrown if any IO issues are encountered.
+	 */
+	public boolean acceptConnection() throws IOException
+	{
+		SocketChannel channel = server.accept();
+		
+		if(channel == null)
+			return false;
+		
+		//enable nio
+		channel.configureBlocking(false);
+		
+		//build the socket client instance
+		SocketClient client = new SocketClient(uidCounter++, channel);
+		
+		//verify the socket client is allowed in
+		if(networkConnectionFilter == null || networkConnectionFilter.allowed(client))
+		{
+			//TODO thread pool should be assigned to the thread pool with the lowest amount of clients
+			threadPool[threadPoolCounter++].getClients().add(client);
+			
+			if (threadPoolCounter >= threadPool.length)
+				threadPoolCounter = 0;
+		}
+		else
+		{
+			try
+			{
+				client.getSocket().close();
+				client.getSocket().socket().close();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			finally
+			{
+				if(getOnDisconnect() != null)
+					getOnDisconnect().run(client);
+			}
+		}
+		
+		return true;
 	}
 	
 	/**
