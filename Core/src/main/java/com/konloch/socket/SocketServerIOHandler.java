@@ -38,6 +38,7 @@ class SocketServerIOHandler implements Runnable
 			{
 				if (clients.isEmpty())
 				{
+					//sleep only while the server is not processing data
 					try
 					{
 						Thread.sleep(1);

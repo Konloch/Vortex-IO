@@ -86,8 +86,22 @@ public class SocketServer extends Thread
 			try
 			{
 				SocketChannel channel = server.accept();
+				
 				if(channel == null)
+				{
+					//since server.accept is not non-blocking, you need to wait the thread either using some form of
+					//locks, synchronization, or just by Thread.sleep.
+					try
+					{
+						Thread.sleep(1);
+					}
+					catch (InterruptedException e)
+					{
+						e.printStackTrace();
+					}
+					
 					continue;
+				}
 				
 				//enable nio
 				channel.configureBlocking(false);
