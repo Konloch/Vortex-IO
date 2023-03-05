@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Konloch
@@ -124,7 +124,7 @@ public class SocketServer extends Thread
 		channel.configureBlocking(false);
 		
 		//build the socket client instance
-		SocketClient client = new SocketClient(uidCounter++, channel);
+		SocketClient client = new SocketClient(this, channel, uidCounter++);
 		
 		//verify the socket client is allowed in
 		if(networkConnectionFilter == null || networkConnectionFilter.allowed(client))
@@ -263,11 +263,11 @@ public class SocketServer extends Thread
 	}
 	
 	/**
-	 * Returns the Socket Client set for the supplied thread pool index
+	 * Returns the socket client list for the supplied thread pool index
 	 * @param index any integer to represent the thread pool index
-	 * @return the Socket Client Set for the supplied thread pool index
+	 * @return the socket client list for the supplied thread pool index
 	 */
-	public Set<SocketClient> getClients(int index)
+	public List<SocketClient> getClients(int index)
 	{
 		return threadPool[index].getClients();
 	}

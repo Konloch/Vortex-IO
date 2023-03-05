@@ -12,8 +12,9 @@ public class SocketClient
 {
 	private final ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
-	private final long uid;
+	private final SocketServer server;
 	private final SocketChannel socket;
+	private final long uid;
 	private final String remoteAddress;
 	private long lastNetworkActivityRead;
 	private long lastNetworkActivityWrite;
@@ -25,11 +26,16 @@ public class SocketClient
 	
 	/**
 	 * Construct a new socket client
+	 *
+	 * @param server the socket server this client will be bound to
+	 * @param socket the socket channel this client is using for communication
+	 * @param uid the unique user identifier this socket client is assigned
 	 */
-	public SocketClient(long uid, SocketChannel socket)
+	public SocketClient(SocketServer server, SocketChannel socket, long uid)
 	{
 		this.uid = uid;
 		this.socket = socket;
+		this.server = server;
 		this.lastNetworkActivityRead = this.lastNetworkActivityWrite = System.currentTimeMillis();
 		this.remoteAddress = socket.socket().getInetAddress().toString().replace("/","");
 	}
@@ -246,5 +252,15 @@ public class SocketClient
 	public SocketChannel getSocket()
 	{
 		return socket;
+	}
+	
+	/**
+	 * Returns the socket server this client is bound to
+	 *
+	 * @return the socket server this client is bound to
+	 */
+	public SocketServer getServer()
+	{
+		return server;
 	}
 }
