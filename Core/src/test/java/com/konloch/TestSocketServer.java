@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class TestSocketServer
 {
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args)
 	{
 		SocketServer server = new SocketServer(1111, 2, null, client ->
 		{
