@@ -16,13 +16,14 @@ import java.util.List;
 public class SocketServer extends Thread
 {
 	private final int port;
-	private final ServerSocketChannel server;
+	private ServerSocketChannel server;
 	private final SocketServerIOHandler[] threadPool;
 	private SocketClientIsAllowed networkConnectionFilter;
 	private SocketClientRunnable requestHandler;
 	private SocketClientRunnable onDisconnect;
 	private int threadPoolCounter;
 	private boolean running;
+	private boolean bound;
 	private int ioAmount = 1024;
 	private int timeout = 30_000;
 	private long uidCounter;
@@ -47,21 +48,34 @@ public class SocketServer extends Thread
 	 * @param networkConnectionFilter the pre-requst filter
 	 * @param requestHandler the request handler
 	 * @param onDisconnect called any time the client disconnects
-	 * @throws IOException thrown if any IO issues are encountered.
 	 */
 	public SocketServer(int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
-	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect) throws IOException
+	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
 	{
 		this.port = port;
-		this.server = ServerSocketChannel.open();
 		this.threadPool = new SocketServerIOHandler[threadPool];
 		this.networkConnectionFilter = networkConnectionFilter;
 		this.requestHandler = requestHandler;
 		this.onDisconnect = onDisconnect;
+	}
+	
+	/**
+	 * Bind to the socket port
+	 *
+	 * @return this instance for method chaining
+	 * @throws IOException thrown if any IO issues are encountered.
+	 */
+	public SocketServer bind() throws IOException
+	{
+		if(bound)
+			return this;
 		
+		this.server = ServerSocketChannel.open();
 		//bind and configure non-blocking
 		server.bind(new InetSocketAddress("localhost", port));
 		server.configureBlocking(false);
+		bound = true;
+		return this;
 	}
 	
 	/**
@@ -70,6 +84,19 @@ public class SocketServer extends Thread
 	@Override
 	public void run()
 	{
+		//attempt to auto bind on initial start
+		if(!bound)
+		{
+			try
+			{
+				bind();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		if(running)
 			return;
 		
@@ -244,7 +271,7 @@ public class SocketServer extends Thread
 	/**
 	 * Returns the network connection filter
 	 *
-	 * @return the network connection filder
+	 * @return the network connection filter
 	 */
 	public SocketClientIsAllowed getNetworkConnectionFilter()
 	{
