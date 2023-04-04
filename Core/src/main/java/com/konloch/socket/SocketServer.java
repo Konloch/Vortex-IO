@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class SocketServer extends Thread
 {
+	private final String hostname;
 	private final int port;
 	private ServerSocketChannel server;
 	private final SocketServerIOHandler[] threadPool;
@@ -52,6 +53,23 @@ public class SocketServer extends Thread
 	public SocketServer(int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
 	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
 	{
+		this("localhost", port, threadPool, networkConnectionFilter, requestHandler, onDisconnect);
+	}
+
+	/**
+	 * Construct a new Socket Server
+	 *
+	 * @param hostname the hostname the socket will bind to
+	 * @param port any port between 0-65,535
+	 * @param threadPool the amount of threads that will be started
+	 * @param networkConnectionFilter the pre-requst filter
+	 * @param requestHandler the request handler
+	 * @param onDisconnect called any time the client disconnects
+	 */
+	public SocketServer(String hostname, int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
+	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
+	{
+		this.hostname = hostname;
 		this.port = port;
 		this.threadPool = new SocketServerIOHandler[threadPool];
 		this.networkConnectionFilter = networkConnectionFilter;
@@ -72,7 +90,7 @@ public class SocketServer extends Thread
 		
 		this.server = ServerSocketChannel.open();
 		//bind and configure non-blocking
-		server.bind(new InetSocketAddress("localhost", port));
+		server.bind(new InetSocketAddress(hostname, port));
 		server.configureBlocking(false);
 		bound = true;
 		return this;
