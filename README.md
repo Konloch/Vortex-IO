@@ -22,7 +22,7 @@ Add it as a maven dependency or just [download the latest release](https://githu
 ## 💻 How To Use
 You can view an [HTTP Server implementation here](https://github.com/Konloch/HTTPdLib/), or an [IRC Server implementation here](https://github.com/Konloch/OpenIRCd), or an [Echo Server implementation here](https://github.com/Konloch/Socket-Server/tree/main/Example/CR-Echo-Server).
 
-### RFC-862 compliant echo server
+### [RFC-862](https://www.rfc-editor.org/rfc/rfc862) compliant echo server
 ```java
 SocketServer server = new SocketServer(7, client -> 
 {
