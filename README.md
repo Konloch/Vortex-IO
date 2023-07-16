@@ -1,5 +1,5 @@
 # Socket Server
-Socket Server is a high preformant low-level non-blocking socket server API. [Click here for the core library source code](https://github.com/Konloch/Socket-Server/tree/main/Core).
+Socket Server is a high preformant low-level non-blocking tcp socket server API. [Click here for the core library source code](https://github.com/Konloch/Socket-Server/tree/main/Core).
 
 ## 💡 Requirements
 + Java Runtime 1.8 **or higher**
