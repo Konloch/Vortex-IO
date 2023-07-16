@@ -1,11 +1,10 @@
 # Socket Server
-Socket Server is a low-level non-blocking socket server API.
+Socket Server is a high preformant low-level non-blocking socket server API. [Click here for the core library source code](https://github.com/Konloch/Socket-Server/tree/main/Core).
 
-+ For the core library [click here](https://github.com/Konloch/Socket-Server/tree/main/Core).
-+ For an example simple echo server (no data buffer) [click here](https://github.com/Konloch/Socket-Server/tree/main/Example/Echo-Server).
-+ For an example advanced echo server (contains data buffer) [click here](https://github.com/Konloch/Socket-Server/tree/main/Example/CR-Echo-Server).
+## 💡 Requirements
++ Java Runtime 1.8 **or higher**
 
-## How To Add As Library
+## ⚙️ How To Add As Library
 Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Socket-Server/releases).
 ```xml
 <dependency>
@@ -15,12 +14,12 @@ Add it as a maven dependency or just [download the latest release](https://githu
 </dependency>
 ```
 
-## Links
+## 👨‍💻 Links
 * [Website](https://konloch.com/Socket-Server/)
 * [Discord Server](https://discord.gg/aexsYpfMEf)
 * [Download Releases](https://github.com/Konloch/Socket-Server/releases)
 
-## How To Use
+## 💻 How To Use
 You can view an [HTTP Server implementation here](https://github.com/Konloch/HTTPdLib/), or an [IRC Server implementation here](https://github.com/Konloch/OpenIRCd), or an [Echo Server implementation here](https://github.com/Konloch/Socket-Server/tree/main/Example/CR-Echo-Server).
 
 ### RFC-862 compliant echo server
