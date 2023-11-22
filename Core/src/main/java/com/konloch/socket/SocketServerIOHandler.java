@@ -90,7 +90,7 @@ class SocketServerIOHandler implements Runnable
 						else
 							client.setInputRead(false);
 						
-						buffer.clear();
+						((java.nio.Buffer) buffer).clear();
 						
 						//processing writing (only write when asked to)
 						if (client.isOutputWrite())
@@ -119,7 +119,7 @@ class SocketServerIOHandler implements Runnable
 								buffer.put(bufferDump, offset, readMax);
 								
 								//flip the stored data
-								buffer.flip();
+								((java.nio.Buffer) buffer).flip();
 								
 								//reset the network activity
 								client.resetLastNetworkActivityWrite();
@@ -128,7 +128,7 @@ class SocketServerIOHandler implements Runnable
 								client.getSocket().write(buffer);
 								
 								//clear the buffer
-								buffer.clear();
+								((java.nio.Buffer) buffer).clear();
 							}
 							else
 							{
