@@ -53,7 +53,7 @@ public class SocketServer extends Thread
 	public SocketServer(int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
 	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
 	{
-		this("localhost", port, threadPool, networkConnectionFilter, requestHandler, onDisconnect);
+		this("0.0.0.0", port, threadPool, networkConnectionFilter, requestHandler, onDisconnect);
 	}
 
 	/**
