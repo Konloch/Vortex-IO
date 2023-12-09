@@ -54,6 +54,9 @@ class SocketServerIOHandler implements Runnable
 				//remove any clients not connected
 				clients.removeIf(client ->
 				{
+					if(client == null)
+						return true;
+					
 					boolean remove = !client.getSocket().isConnected();
 					
 					if (remove && socketServer.getOnDisconnect() != null)
@@ -65,6 +68,9 @@ class SocketServerIOHandler implements Runnable
 				//iterate thru all clients
 				for (SocketClient client : clients)
 				{
+					if(client == null)
+						continue;
+					
 					try
 					{
 						//if the client has been disconnected, do not try to process anything
