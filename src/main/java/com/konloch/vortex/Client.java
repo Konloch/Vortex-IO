@@ -2,6 +2,8 @@ package com.konloch.vortex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -37,7 +39,7 @@ public class Client
 		this.socket = socket;
 		this.server = server;
 		this.lastNetworkActivityRead = this.lastNetworkActivityWrite = System.currentTimeMillis();
-		this.remoteAddress = socket.socket().getInetAddress().toString().replace("/","");
+		this.remoteAddress = resolveRemoteAddress();
 	}
 	
 	/**
@@ -262,5 +264,23 @@ public class Client
 	public Server getServer()
 	{
 		return server;
+	}
+	
+	/**
+	 * Resolve the remote address
+	 *
+	 * @return the remote address, or an empty string if that failed
+	 */
+	private String resolveRemoteAddress()
+	{
+		if(socket == null)
+			return ""; //return empty instead of null
+		
+		Socket javaSocket = socket.socket();
+		
+		if(javaSocket == null)
+			return ""; //return empty instead of null
+		
+		return javaSocket.toString().replace("/","");
 	}
 }
