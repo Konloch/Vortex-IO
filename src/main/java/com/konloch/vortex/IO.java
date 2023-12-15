@@ -1,4 +1,4 @@
-package com.konloch.socket;
+package com.konloch.vortex;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -8,19 +8,19 @@ import java.util.*;
  * @author Konloch
  * @since 3/1/2023
  */
-class SocketServerIOHandler implements Runnable
+class IO implements Runnable
 {
-	private final SocketServer socketServer;
-	private final List<SocketClient> clients = new ArrayList<>();
+	private final Server server;
+	private final List<Client> clients = new ArrayList<>();
 	
 	/**
 	 * Construct a new SocketServerIO
 	 *
-	 * @param socketServer the SocketServer this IO Handler is bound to
+	 * @param server the SocketServer this IO Handler is bound to
 	 */
-	public SocketServerIOHandler(SocketServer socketServer)
+	public IO(Server server)
 	{
-		this.socketServer = socketServer;
+		this.server = server;
 	}
 	
 	/**
@@ -29,8 +29,8 @@ class SocketServerIOHandler implements Runnable
 	@Override
 	public void run()
 	{
-		ByteBuffer buffer = ByteBuffer.allocate(socketServer.getIOAmount());
-		while (socketServer.isRunning())
+		ByteBuffer buffer = ByteBuffer.allocate(server.getIOAmount());
+		while (server.isRunning())
 		{
 			try
 			{
@@ -59,14 +59,14 @@ class SocketServerIOHandler implements Runnable
 					
 					boolean remove = !client.getSocket().isConnected();
 					
-					if (remove && socketServer.getOnDisconnect() != null)
-						socketServer.getOnDisconnect().run(client);
+					if (remove && server.getOnDisconnect() != null)
+						server.getOnDisconnect().run(client);
 					
 					return remove;
 				});
 				
 				//iterate thru all clients
-				for (SocketClient client : clients)
+				for (Client client : clients)
 				{
 					if(client == null)
 						continue;
@@ -79,7 +79,7 @@ class SocketServerIOHandler implements Runnable
 
 						//timeout if there is no network activity
 						if (Math.min(now - client.getLastNetworkActivityWrite(),
-								now - client.getLastNetworkActivityRead()) > socketServer.getTimeout())
+								now - client.getLastNetworkActivityRead()) > server.getTimeout())
 						{
 							client.getSocket().close();
 							continue;
@@ -106,7 +106,7 @@ class SocketServerIOHandler implements Runnable
 							{
 								int offset = client.getOutputBufferProgress();
 								
-								int readMax = socketServer.getIOAmount();
+								int readMax = server.getIOAmount();
 								
 								if(!fromCache)
 									client.setOutputBufferCache(client.getOutputBuffer().toByteArray());
@@ -163,7 +163,7 @@ class SocketServerIOHandler implements Runnable
 					
 					try
 					{
-						socketServer.getRequestHandler().run(client);
+						server.getRequestHandler().run(client);
 					}
 					catch (Exception e)
 					{
@@ -187,7 +187,7 @@ class SocketServerIOHandler implements Runnable
 	 *
 	 * @return the Socket Client list containing the connected clients
 	 */
-	public List<SocketClient> getClients()
+	public List<Client> getClients()
 	{
 		return clients;
 	}

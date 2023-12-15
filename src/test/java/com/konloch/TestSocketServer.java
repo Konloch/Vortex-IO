@@ -1,8 +1,7 @@
 package com.konloch;
 
-import com.konloch.socket.SocketServer;
+import com.konloch.vortex.Server;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
@@ -14,7 +13,7 @@ public class TestSocketServer
 {
 	public static void main(String[] args)
 	{
-		SocketServer server = new SocketServer(1111, 2, null, client ->
+		Server server = new Server(1111, 2, null, client ->
 		{
 			switch(client.getState())
 			{

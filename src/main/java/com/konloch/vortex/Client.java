@@ -1,4 +1,4 @@
-package com.konloch.socket;
+package com.konloch.vortex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,11 +8,11 @@ import java.nio.channels.SocketChannel;
  * @author Konloch
  * @since 2/28/2023
  */
-public class SocketClient
+public class Client
 {
 	private final ByteArrayOutputStream inputBuffer = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream outputBuffer = new ByteArrayOutputStream();
-	private final SocketServer server;
+	private final Server server;
 	private final SocketChannel socket;
 	private final long uid;
 	private final String remoteAddress;
@@ -31,7 +31,7 @@ public class SocketClient
 	 * @param socket the socket channel this client is using for communication
 	 * @param uid the unique user identifier this socket client is assigned
 	 */
-	public SocketClient(SocketServer server, SocketChannel socket, long uid)
+	public Client(Server server, SocketChannel socket, long uid)
 	{
 		this.uid = uid;
 		this.socket = socket;
@@ -259,7 +259,7 @@ public class SocketClient
 	 *
 	 * @return the socket server this client is bound to
 	 */
-	public SocketServer getServer()
+	public Server getServer()
 	{
 		return server;
 	}

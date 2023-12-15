@@ -1,7 +1,7 @@
-package com.konloch.socket;
+package com.konloch.vortex;
 
-import com.konloch.socket.interfaces.SocketClientIsAllowed;
-import com.konloch.socket.interfaces.SocketClientRunnable;
+import com.konloch.vortex.interfaces.IsAllowed;
+import com.konloch.vortex.interfaces.ClientRunnable;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -13,15 +13,15 @@ import java.util.List;
  * @author Konloch
  * @since 2/28/2023
  */
-public class SocketServer extends Thread
+public class Server extends Thread
 {
 	private final String hostname;
 	private final int port;
 	private ServerSocketChannel server;
-	private final SocketServerIOHandler[] threadPool;
-	private SocketClientIsAllowed networkConnectionFilter;
-	private SocketClientRunnable requestHandler;
-	private SocketClientRunnable onDisconnect;
+	private final IO[] threadPool;
+	private IsAllowed networkConnectionFilter;
+	private ClientRunnable requestHandler;
+	private ClientRunnable onDisconnect;
 	private int threadPoolCounter;
 	private boolean running;
 	private boolean bound;
@@ -36,7 +36,7 @@ public class SocketServer extends Thread
 	 * @param requestHandler the request handler
 	 * @throws IOException thrown if any IO issues are encountered.
 	 */
-	public SocketServer(int port, SocketClientRunnable requestHandler) throws IOException
+	public Server(int port, ClientRunnable requestHandler) throws IOException
 	{
 		this(port, 1, null, requestHandler, null);
 	}
@@ -50,8 +50,8 @@ public class SocketServer extends Thread
 	 * @param requestHandler the request handler
 	 * @param onDisconnect called any time the client disconnects
 	 */
-	public SocketServer(int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
-	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
+	public Server(int port, int threadPool, IsAllowed networkConnectionFilter,
+	              ClientRunnable requestHandler, ClientRunnable onDisconnect)
 	{
 		this("0.0.0.0", port, threadPool, networkConnectionFilter, requestHandler, onDisconnect);
 	}
@@ -66,12 +66,12 @@ public class SocketServer extends Thread
 	 * @param requestHandler the request handler
 	 * @param onDisconnect called any time the client disconnects
 	 */
-	public SocketServer(String hostname, int port, int threadPool, SocketClientIsAllowed networkConnectionFilter,
-	                    SocketClientRunnable requestHandler, SocketClientRunnable onDisconnect)
+	public Server(String hostname, int port, int threadPool, IsAllowed networkConnectionFilter,
+	              ClientRunnable requestHandler, ClientRunnable onDisconnect)
 	{
 		this.hostname = hostname;
 		this.port = port;
-		this.threadPool = new SocketServerIOHandler[threadPool];
+		this.threadPool = new IO[threadPool];
 		this.networkConnectionFilter = networkConnectionFilter;
 		this.requestHandler = requestHandler;
 		this.onDisconnect = onDisconnect;
@@ -83,7 +83,7 @@ public class SocketServer extends Thread
 	 * @return this instance for method chaining
 	 * @throws IOException thrown if any IO issues are encountered.
 	 */
-	public SocketServer bind() throws IOException
+	public Server bind() throws IOException
 	{
 		if(bound)
 			return this;
@@ -122,7 +122,7 @@ public class SocketServer extends Thread
 		
 		for(int i = 0; i < threadPool.length; i++)
 		{
-			SocketServerIOHandler socketIO = new SocketServerIOHandler(this);
+			IO socketIO = new IO(this);
 			new Thread(threadPool[i] = socketIO).start();
 		}
 		
@@ -169,7 +169,7 @@ public class SocketServer extends Thread
 		channel.configureBlocking(false);
 		
 		//build the socket client instance
-		SocketClient client = new SocketClient(this, channel, uidCounter++);
+		Client client = new Client(this, channel, uidCounter++);
 		
 		//verify the socket client is allowed in
 		if(networkConnectionFilter == null || networkConnectionFilter.allowed(client))
@@ -226,7 +226,7 @@ public class SocketServer extends Thread
 	 *
 	 * @return this instance for method chaining
 	 */
-	public SocketServer stopSocketServer()
+	public Server stopSocketServer()
 	{
 		running = false;
 		return this;
@@ -247,7 +247,7 @@ public class SocketServer extends Thread
 	 *
 	 * @return the request handler
 	 */
-	public SocketClientRunnable getRequestHandler()
+	public ClientRunnable getRequestHandler()
 	{
 		return requestHandler;
 	}
@@ -258,7 +258,7 @@ public class SocketServer extends Thread
 	 * @param requestHandler any request handler
 	 * @return this instance for method chaining
 	 */
-	public SocketServer setRequestHandler(SocketClientRunnable requestHandler)
+	public Server setRequestHandler(ClientRunnable requestHandler)
 	{
 		this.requestHandler = requestHandler;
 		return this;
@@ -269,7 +269,7 @@ public class SocketServer extends Thread
 	 *
 	 * @return the onDisconnect handler
 	 */
-	public SocketClientRunnable getOnDisconnect()
+	public ClientRunnable getOnDisconnect()
 	{
 		return onDisconnect;
 	}
@@ -280,7 +280,7 @@ public class SocketServer extends Thread
 	 * @param onDisconnect any onDisconnet handler
 	 * @return this instance for method chaining
 	 */
-	public SocketServer setOnDisconnect(SocketClientRunnable onDisconnect)
+	public Server setOnDisconnect(ClientRunnable onDisconnect)
 	{
 		this.onDisconnect = onDisconnect;
 		return this;
@@ -291,7 +291,7 @@ public class SocketServer extends Thread
 	 *
 	 * @return the network connection filter
 	 */
-	public SocketClientIsAllowed getNetworkConnectionFilter()
+	public IsAllowed getNetworkConnectionFilter()
 	{
 		return networkConnectionFilter;
 	}
@@ -301,7 +301,7 @@ public class SocketServer extends Thread
 	 * @param networkConnectionFilter any network connection filter
 	 * @return this instance for method chaining
 	 */
-	public SocketServer setNetworkConnectionFilter(SocketClientIsAllowed networkConnectionFilter)
+	public Server setNetworkConnectionFilter(IsAllowed networkConnectionFilter)
 	{
 		this.networkConnectionFilter = networkConnectionFilter;
 		return this;
@@ -312,7 +312,7 @@ public class SocketServer extends Thread
 	 * @param index any integer to represent the thread pool index
 	 * @return the socket client list for the supplied thread pool index
 	 */
-	public List<SocketClient> getClients(int index)
+	public List<Client> getClients(int index)
 	{
 		return threadPool[index].getClients();
 	}
@@ -332,7 +332,7 @@ public class SocketServer extends Thread
 	 * @param timeout any integer representing the milliseconds for timeout from network activity
 	 * @return this instance for method chaining
 	 */
-	public SocketServer setTimeout(int timeout)
+	public Server setTimeout(int timeout)
 	{
 		this.timeout = timeout;
 		return this;
@@ -354,7 +354,7 @@ public class SocketServer extends Thread
 	 * @param ioAmount any integer as the default size of the byte buffers
 	 * @return this instance for method chaining
 	 */
-	public SocketServer setIOAmount(int ioAmount)
+	public Server setIOAmount(int ioAmount)
 	{
 		this.ioAmount = ioAmount;
 		
@@ -368,6 +368,6 @@ public class SocketServer extends Thread
 	 */
 	public static void main(String[] args)
 	{
-		throw new RuntimeException("Incorrect usage - for information on how to use this correctly visit https://konloch.com/Socket-Server/");
+		throw new RuntimeException("Incorrect usage - for information on how to use this correctly visit https://konloch.com/Vortex-IO/");
 	}
 }

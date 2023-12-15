@@ -1,11 +1,11 @@
-# Socket Server
-Socket Server is a high preformant low-level non-blocking tcp socket server API. [Click here for the core library source code](https://github.com/Konloch/Socket-Server/tree/main/Core).
+# Vortex IO
+Vortex IO is a high preformant low-level non-blocking tcp socket server API. [Click here for the core library source code](https://github.com/Konloch/Vortex-IO/tree/main/Core).
 
 ## 💡 Requirements
 + Java Runtime 1.8 **or higher**
 
 ## ⚙️ How To Add As Library
-Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Socket-Server/releases).
+Add it as a maven dependency or just [download the latest release](https://github.com/Konloch/Vortex-IO/releases).
 ```xml
 <dependency>
   <groupId>com.konloch</groupId>
@@ -15,9 +15,9 @@ Add it as a maven dependency or just [download the latest release](https://githu
 ```
 
 ## 📚 Links
-* [Website](https://konloch.com/Socket-Server/)
+* [Website](https://konloch.com/Vortex-IO/)
 * [Discord Server](https://discord.gg/aexsYpfMEf)
-* [Download Releases](https://github.com/Konloch/Socket-Server/releases)
+* [Download Releases](https://github.com/Konloch/Vortex-IO/releases)
 
 ## 💻 How To Use
 You can view an [HTTP Server implementation here](https://github.com/Konloch/HTTPdLib/), or an [IRC Server implementation here](https://github.com/Konloch/OpenIRCd), or an [Echo Server implementation here](https://github.com/Konloch/EchoServer/tree/main/CR-Echo-Server).
