@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.konloch</groupId>
-	<artifactId>Socket-Server</artifactId>
+	<artifactId>Vortex-IO</artifactId>
 	<version>0.9.5</version>
 
-	<name>Socket Server</name>
-	<description>Socket Server is an easy-to-use zero dependency low-level socket server for Java.</description>
-	<url>https://konloch.com/Socket-Server/</url>
+	<name>Vortex IO</name>
+	<description>Vortex IO is an easy-to-use zero dependency low-level socket server for Java.</description>
+	<url>https://konloch.com/Vortex-IO/</url>
 	<inceptionYear>2012</inceptionYear>
 
 	<licenses>
@@ -33,9 +33,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/Konloch/Socket-Server.git</connection>
-		<developerConnection>scm:git:ssh://github.com:Konloch/Socket-Server.git</developerConnection>
-		<url>http://github.com/Konloch/Socket-Server/tree/master/Core</url>
+		<connection>scm:git:git://github.com/Konloch/Vortex-IO.git</connection>
+		<developerConnection>scm:git:ssh://github.com:Konloch/Vortex-IO.git</developerConnection>
+		<url>http://github.com/Konloch/Vortex-IO/tree/master/Core</url>
 	</scm>
 
 	<properties>
