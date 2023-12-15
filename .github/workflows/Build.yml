@@ -1,6 +1,6 @@
 # This will build the repo and upload the package as an artifact
 
-name: Build Socket Server
+name: Build
 
 on:
   push:
@@ -35,6 +35,6 @@ jobs:
       uses: actions/upload-artifact@v3
       if: ${{ matrix.java == '8' }}
       with:
-        name: Socket-Server-${{ env.lib_version }}-SNAPSHOT
-        path: target/Socket-Server-${{ env.lib_version }}.jar
+        name: Vortex-IO-${{ env.lib_version }}-SNAPSHOT
+        path: target/Vortex-IO-${{ env.lib_version }}.jar
         retention-days: 90
