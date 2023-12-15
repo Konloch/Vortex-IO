@@ -8,5 +8,9 @@ import com.konloch.vortex.Client;
  */
 public interface ClientRunnable
 {
+	/**
+	 * Runnable function
+	 * @param client the client reference
+	 */
 	void run(Client client);
 }

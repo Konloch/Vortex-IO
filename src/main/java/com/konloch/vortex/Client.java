@@ -28,7 +28,6 @@ public class Client
 	
 	/**
 	 * Construct a new socket client
-	 *
 	 * @param server the socket server this client will be bound to
 	 * @param socket the socket channel this client is using for communication
 	 * @param uid the unique user identifier this socket client is assigned
@@ -44,7 +43,6 @@ public class Client
 	
 	/**
 	 * Write to a byte array the output buffer
-	 *
 	 * @param bytes any byte array
 	 */
 	public void write(byte[] bytes)
@@ -63,7 +61,6 @@ public class Client
 	
 	/**
 	 * Returns the output buffer write progress
-	 *
 	 * @return the output buffer write progress
 	 */
 	public int getOutputBufferProgress()
@@ -73,7 +70,6 @@ public class Client
 	
 	/**
 	 * Adds to the output buffer progress and then returns the current value
-	 *
 	 * @param add the amount of progress to increase by
 	 * @return the output buffer write progress
 	 */
@@ -111,7 +107,6 @@ public class Client
 	
 	/**
 	 * Returns the unique user id for this specific connection
-	 *
 	 * @return the unique user id for this specific connection
 	 */
 	public long getUID()
@@ -130,7 +125,6 @@ public class Client
 	
 	/**
 	 * Returns the last read network activity for this socket
-	 *
 	 * @return a long representing the timestamp of the last time the socket read
 	 */
 	public long getLastNetworkActivityRead()
@@ -140,7 +134,6 @@ public class Client
 	
 	/**
 	 * Returns the last write network activity for this socket
-	 *
 	 * @return a long representing the timestamp of the last time the socket writes
 	 */
 	public long getLastNetworkActivityWrite()
@@ -150,7 +143,6 @@ public class Client
 	
 	/**
 	 * Returns true if the socket client is in the read state
-	 *
 	 * @return true if the socket client is in the read state
 	 */
 	public boolean isInputRead()
@@ -160,7 +152,6 @@ public class Client
 	
 	/**
 	 * Set the read state for the socket client
-	 *
 	 * @param inputRead set true to enable the read state for the socket client
 	 */
 	public void setInputRead(boolean inputRead)
@@ -170,7 +161,6 @@ public class Client
 	
 	/**
 	 * Returns true if the socket client is in the write state
-	 *
 	 * @return true if the socket client is in the write state
 	 */
 	public boolean isOutputWrite()
@@ -180,7 +170,6 @@ public class Client
 	
 	/**
 	 * Set the write state for the socket client
-	 *
 	 * @param outputWrite set true to enable the write state for the socket client
 	 */
 	public void setOutputWrite(boolean outputWrite)
@@ -208,7 +197,6 @@ public class Client
 	
 	/**
 	 * Returns the input buffer
-	 *
 	 * @return the ByteArrayOutputStream representing the input buffer
 	 */
 	public ByteArrayOutputStream getInputBuffer()
@@ -218,7 +206,6 @@ public class Client
 	
 	/**
 	 * Returns the output buffer
-	 *
 	 * @return the ByteArrayOutputStream representing the output buffer
 	 */
 	public ByteArrayOutputStream getOutputBuffer()
@@ -237,7 +224,6 @@ public class Client
 	
 	/**
 	 * Set the output buffer cache
-	 *
 	 * @param outputBufferCache any byte array as the buffer cache
 	 */
 	public void setOutputBufferCache(byte[] outputBufferCache)
@@ -248,7 +234,6 @@ public class Client
 	
 	/**
 	 * Returns the bound NIO socket channel
-	 *
 	 * @return the bound NIO socket channel
 	 */
 	public SocketChannel getSocket()
@@ -258,7 +243,6 @@ public class Client
 	
 	/**
 	 * Returns the socket server this client is bound to
-	 *
 	 * @return the socket server this client is bound to
 	 */
 	public Server getServer()
@@ -268,7 +252,6 @@ public class Client
 	
 	/**
 	 * Resolve the remote address
-	 *
 	 * @return the remote address, or an empty string if that failed
 	 */
 	private String resolveRemoteAddress()

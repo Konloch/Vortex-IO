@@ -8,5 +8,10 @@ import com.konloch.vortex.Client;
  */
 public interface IsAllowed
 {
+	/**
+	 * Used for filtering
+	 * @param client the client reference
+	 * @return true if allowed, false if not
+	 */
 	boolean allowed(Client client);
 }

@@ -31,7 +31,6 @@ public class Server extends Thread
 	
 	/**
 	 * Construct a new Socket Server
-	 *
 	 * @param port any port between 0-65,535
 	 * @param requestHandler the request handler
 	 * @throws IOException thrown if any IO issues are encountered.
@@ -43,7 +42,6 @@ public class Server extends Thread
 	
 	/**
 	 * Construct a new Socket Server
-	 *
 	 * @param port any port between 0-65,535
 	 * @param threadPool the amount of threads that will be started
 	 * @param networkConnectionFilter the pre-requst filter
@@ -58,7 +56,6 @@ public class Server extends Thread
 
 	/**
 	 * Construct a new Socket Server
-	 *
 	 * @param hostname the hostname the socket will bind to
 	 * @param port any port between 0-65,535
 	 * @param threadPool the amount of threads that will be started
@@ -79,7 +76,6 @@ public class Server extends Thread
 	
 	/**
 	 * Bind to the socket port
-	 *
 	 * @return this instance for method chaining
 	 * @throws IOException thrown if any IO issues are encountered.
 	 */
@@ -154,7 +150,6 @@ public class Server extends Thread
 	
 	/**
 	 * Attempts to accept an incoming socket connection, if there is not one in the queue it will return false.
-	 *
 	 * @return true if a connection has been accepted
 	 * @throws IOException thrown if any IO issues are encountered.
 	 */
@@ -203,7 +198,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns the port the socket server is bound to
-	 *
 	 * @return the port the socket server is bound to
 	 */
 	public int getPort()
@@ -213,7 +207,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns true if the socket server is still running
-	 *
 	 * @return true if the socket server is still running
 	 */
 	public boolean isRunning()
@@ -223,7 +216,6 @@ public class Server extends Thread
 	
 	/**
 	 * Stops the socket server
-	 *
 	 * @return this instance for method chaining
 	 */
 	public Server stopSocketServer()
@@ -234,7 +226,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns true if the socket server has been stopped
-	 *
 	 * @return true if the socket server has been stopped
 	 */
 	public boolean hasStopped()
@@ -244,7 +235,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns the request handler
-	 *
 	 * @return the request handler
 	 */
 	public ClientRunnable getRequestHandler()
@@ -254,7 +244,6 @@ public class Server extends Thread
 	
 	/**
 	 * Set the request handler
-	 *
 	 * @param requestHandler any request handler
 	 * @return this instance for method chaining
 	 */
@@ -266,7 +255,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns the onDisconnect handler
-	 *
 	 * @return the onDisconnect handler
 	 */
 	public ClientRunnable getOnDisconnect()
@@ -276,7 +264,6 @@ public class Server extends Thread
 	
 	/**
 	 * Set the onDisconnect handler
-	 *
 	 * @param onDisconnect any onDisconnet handler
 	 * @return this instance for method chaining
 	 */
@@ -288,7 +275,6 @@ public class Server extends Thread
 	
 	/**
 	 * Returns the network connection filter
-	 *
 	 * @return the network connection filter
 	 */
 	public IsAllowed getNetworkConnectionFilter()
@@ -328,7 +314,6 @@ public class Server extends Thread
 	
 	/**
 	 * Set the timeout value for network activity
-	 *
 	 * @param timeout any integer representing the milliseconds for timeout from network activity
 	 * @return this instance for method chaining
 	 */
@@ -340,7 +325,6 @@ public class Server extends Thread
 	
 	/**
 	 * Return the default size of the byte buffers
-	 *
 	 * @return default size of the byte buffers
 	 */
 	public int getIOAmount()
@@ -350,7 +334,6 @@ public class Server extends Thread
 	
 	/**
 	 * Set the default size of the byte buffers
-	 *
 	 * @param ioAmount any integer as the default size of the byte buffers
 	 * @return this instance for method chaining
 	 */
@@ -363,7 +346,6 @@ public class Server extends Thread
 	
 	/**
 	 * Alert that this is a library
-	 *
 	 * @param args program launch arguments
 	 */
 	public static void main(String[] args)

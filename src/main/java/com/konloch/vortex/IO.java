@@ -15,7 +15,6 @@ class IO implements Runnable
 	
 	/**
 	 * Construct a new SocketServerIO
-	 *
 	 * @param server the SocketServer this IO Handler is bound to
 	 */
 	public IO(Server server)
@@ -184,7 +183,6 @@ class IO implements Runnable
 	
 	/**
 	 * Return the socket client list containing the connected clients
-	 *
 	 * @return the Socket Client list containing the connected clients
 	 */
 	public List<Client> getClients()
