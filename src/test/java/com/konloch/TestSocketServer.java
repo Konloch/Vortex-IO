@@ -13,10 +13,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TestSocketServer
 {
 	//change this value to increase the amount of concurrent clients
-	private static final int TEST_THREADS = 2;
+	private static final int CLIENT_TEST_THREADS = 2;
+	
+	//change this value to adjust the time till timeout in ms
+	private static final int CLIENT_TIMEOUT = 7000;
 	
 	//change this value to increase the amount of server processing threads
-	private static final int THREAD_POOL = 2;
+	private static final int SERVER_THREAD_POOL = 2;
+	
+	//change this value to adjust the time till timeout in ms
+	private static final int SERVER_TIMEOUT = 30_000;
 	
 	private static long lastDataTransferBPS;
 	private static AtomicLong totalAmountOfDataTransferred = new AtomicLong();
@@ -26,7 +32,8 @@ public class TestSocketServer
 	public static void main(String[] args)
 	{
 		Server server = setupServer();
-		testServer(server.getPort(), TEST_THREADS);
+		server.setTimeout(SERVER_TIMEOUT);
+		testServer(server.getPort(), CLIENT_TEST_THREADS);
 		
 		while(true)
 		{
@@ -35,7 +42,7 @@ public class TestSocketServer
 				Thread.sleep(10);
 				
 				int connectedClientsAmount = 0;
-				for(int i = 0; i < THREAD_POOL; i++)
+				for(int i = 0; i < SERVER_THREAD_POOL; i++)
 					connectedClientsAmount += server.getClients(i).size();
 				
 				System.out.println("Connected Clients: " + connectedClientsAmount + ", Total Bytes Transferred: " + totalAmountOfDataTransferred + ", Bytes Transferred Per Second: " + lastDataTransferBPS);
@@ -49,7 +56,7 @@ public class TestSocketServer
 	
 	private static Server setupServer()
 	{
-		Server server = new Server(1111, THREAD_POOL, null, client ->
+		Server server = new Server(1111, SERVER_THREAD_POOL, null, client ->
 		{
 			switch(client.getState())
 			{
@@ -127,8 +134,7 @@ public class TestSocketServer
 		socket.getOutputStream().flush();
 		
 		long readTimer = System.currentTimeMillis();
-		long giveUp = 7000; //change this value to adjust the time till it will 'give up'
-		while(socket.getInputStream().available() <= len && System.currentTimeMillis()-readTimer <= giveUp)
+		while(socket.getInputStream().available() <= len && System.currentTimeMillis()-readTimer <= CLIENT_TIMEOUT)
 		{
 			Thread.sleep(1);
 		}
