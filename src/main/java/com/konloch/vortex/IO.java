@@ -1,7 +1,9 @@
 package com.konloch.vortex;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 
 /**
@@ -56,7 +58,28 @@ class IO implements Runnable
 					if(client == null)
 						return true;
 					
-					boolean remove = !client.getSocket().isConnected();
+					final SocketChannel clientSC = client.getSocket();
+					
+					if(clientSC == null)
+						return true;
+					
+					boolean remove = !clientSC.isConnected();
+					
+					//timeout if there is no network activity
+					if (Math.min(now - client.getLastNetworkActivityWrite(),
+							now - client.getLastNetworkActivityRead()) > server.getTimeout())
+					{
+						remove = true;
+						
+						try
+						{
+							clientSC.close();
+						}
+						catch (IOException e)
+						{
+							//ignore
+						}
+					}
 					
 					if (remove && server.getOnDisconnect() != null)
 						server.getOnDisconnect().run(client);
@@ -70,22 +93,19 @@ class IO implements Runnable
 					if(client == null)
 						continue;
 					
+					final SocketChannel clientSC = client.getSocket();
+					
+					if(clientSC == null)
+						continue;
+					
 					try
 					{
 						//if the client has been disconnected, do not try to process anything
-						if (!client.getSocket().isConnected())
+						if (!clientSC.isConnected())
 							continue;
-
-						//timeout if there is no network activity
-						if (Math.min(now - client.getLastNetworkActivityWrite(),
-								now - client.getLastNetworkActivityRead()) > server.getTimeout())
-						{
-							client.getSocket().close();
-							continue;
-						}
 						
 						//process reading (always in the reading state unless disconnected)
-						client.getSocket().read(buffer);
+						clientSC.read(buffer);
 						
 						if (buffer.position() > 0)
 						{
@@ -130,7 +150,7 @@ class IO implements Runnable
 								client.resetLastNetworkActivityWrite();
 								
 								//sent the buffer
-								client.getSocket().write(buffer);
+								clientSC.write(buffer);
 								
 								//clear the buffer
 								((java.nio.Buffer) buffer).clear();
@@ -148,7 +168,7 @@ class IO implements Runnable
 						
 						try
 						{
-							client.getSocket().close();
+							clientSC.close();
 						}
 						catch (Exception ex)
 						{
