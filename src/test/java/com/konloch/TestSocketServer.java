@@ -4,6 +4,7 @@ import com.konloch.vortex.Server;
 
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Konloch
@@ -11,9 +12,44 @@ import java.nio.charset.StandardCharsets;
  */
 public class TestSocketServer
 {
+	//change this value to increase the amount of concurrent clients
+	private static final int TEST_THREADS = 2;
+	
+	//change this value to increase the amount of server processing threads
+	private static final int THREAD_POOL = 2;
+	
+	private static long lastDataTransferBPS;
+	private static AtomicLong totalAmountOfDataTransferred = new AtomicLong();
+	private static AtomicLong dataTransferBPS = new AtomicLong();
+	private static AtomicLong lastTransfer = new AtomicLong();
+	
 	public static void main(String[] args)
 	{
-		Server server = new Server(1111, 2, null, client ->
+		Server server = setupServer();
+		testServer(server.getPort(), TEST_THREADS);
+		
+		while(true)
+		{
+			try
+			{
+				Thread.sleep(10);
+				
+				int connectedClientsAmount = 0;
+				for(int i = 0; i < THREAD_POOL; i++)
+					connectedClientsAmount += server.getClients(i).size();
+				
+				System.out.println("Connected Clients: " + connectedClientsAmount + ", Total Bytes Transferred: " + totalAmountOfDataTransferred + ", Bytes Transferred Per Second: " + lastDataTransferBPS);
+			}
+			catch (Throwable e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private static Server setupServer()
+	{
+		Server server = new Server(1111, THREAD_POOL, null, client ->
 		{
 			switch(client.getState())
 			{
@@ -25,14 +61,14 @@ public class TestSocketServer
 					//advance to stage 1
 					client.setState(1);
 					break;
-					
+				
 				//wait until the stream has signalled the buffer has reached the end
 				case 1:
 					//when the buffer is full advance to stage 2
 					if(!client.isInputRead())
 						client.setState(2);
 					break;
-					
+				
 				//announce the read
 				case 2:
 					//get the bytes written
@@ -50,19 +86,23 @@ public class TestSocketServer
 			}
 		}, client -> {});
 		server.start();
-		
-		for(int i = 0; i < 2; i++)
+		return server;
+	}
+	
+	private static void testServer(int port, int threads)
+	{
+		for(int i = 0; i < threads; i++)
 		{
 			new Thread(()->{
 				while(true)
 				{
 					try
 					{
-						testConnection(server.getPort());
+						testConnection(port);
 					}
-					catch (Exception e)
+					catch (Throwable e)
 					{
-						e.printStackTrace();
+						//ignore exceptions and wait 100 ms
 						try
 						{
 							Thread.sleep(100);
@@ -86,8 +126,9 @@ public class TestSocketServer
 		socket.getOutputStream().write(message.getBytes(StandardCharsets.UTF_8));
 		socket.getOutputStream().flush();
 		
-		long giveUP = System.currentTimeMillis();
-		while(socket.getInputStream().available() <= len && System.currentTimeMillis()-giveUP <=7000)
+		long readTimer = System.currentTimeMillis();
+		long giveUp = 7000; //change this value to adjust the time till it will 'give up'
+		while(socket.getInputStream().available() <= len && System.currentTimeMillis()-readTimer <= giveUp)
 		{
 			Thread.sleep(1);
 		}
@@ -96,11 +137,24 @@ public class TestSocketServer
 		while(socket.getInputStream().available() > 0
 				&& (read = socket.getInputStream().read()) > 0)
 		{
-			System.out.print((char) read);
+			if(System.currentTimeMillis()-lastTransfer.get() >= 1000)
+			{
+				lastDataTransferBPS = dataTransferBPS.get();
+				lastTransfer.set(System.currentTimeMillis());
+				dataTransferBPS.set(0);
+			}
+			
+			//log two bytes per character we read
+			totalAmountOfDataTransferred.addAndGet(2);
+			dataTransferBPS.addAndGet(2);
+			
+			//enable for echo output
+			//System.out.print((char) read);
 		}
 		
 		socket.close();
 		
-		System.out.println();
+		//enable for echo output
+		//System.out.println();
 	}
 }
